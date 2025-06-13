@@ -58,7 +58,7 @@ function FormPage() {
             name="age"
             value={formData.age}
             onChange={handleChange}
-            min="0"
+            min="15"
             max="100"
             required
             className="w-full border rounded p-2"
@@ -76,6 +76,7 @@ function FormPage() {
           >
             <option value="male">Male</option>
             <option value="female">Female</option>
+            <option value="others">Others</option>
           </select>
         </div>
 
@@ -86,7 +87,7 @@ function FormPage() {
             name="height"
             value={formData.height}
             onChange={handleChange}
-            min="30"
+            min="60"
             max="311"
             required
             className="w-full border rounded p-2"
@@ -100,7 +101,7 @@ function FormPage() {
             name="weight"
             value={formData.weight}
             onChange={handleChange}
-            min="1"
+            min="20"
             max="551"
             required
             className="w-full border rounded p-2"
