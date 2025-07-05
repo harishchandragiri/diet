@@ -10,6 +10,7 @@ function App() {
     <Router>
       <Suspense fallback={<Loading />}>
         <Routes>
+          {/* route define */}
           <Route path="/" element={<FormPage />} />
           <Route path="/meals" element={<MealsPage />} />
         </Routes>
