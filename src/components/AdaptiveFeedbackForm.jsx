@@ -5,7 +5,7 @@ import axios from "axios";
 export default function AdaptiveFeedbackForm() {
   const [weightChange, setWeightChange] = useState("");
   const navigate = useNavigate();
-  const [data, setData] = useState();
+  const [data, setData] = useState(null);
 
   useEffect(() => {
     axios.get(`${import.meta.env.VITE_API_URL}/userdetails`, { withCredentials: true })

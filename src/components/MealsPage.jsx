@@ -5,19 +5,19 @@ import axios from 'axios';
 // MealsPage.jsx
 function MealsPage() {
 
-  const [data, setData] = useState([]);
+  const [meals, setMeals] = useState([]);
 
   useEffect(() => {
     axios.get(`${import.meta.env.VITE_API_URL}/getmeals`, { withCredentials: true })
       .then(res => {
-        setData(res.data);
+        setMeals(res.data);
       })
       .catch((err) => 
         console.log(err)
       );
   }, []);
   
-  const meals = [
+  const meal = [
     { breakfast: "tea", lunch: "rice",snack: "fast food", dinner: "bread" },
     { breakfast: "tea", lunch: "rice",snack: "fast food", dinner: "bread" },
     { breakfast: "tea", lunch: "rice",snack: "fast food", dinner: "bread" },
@@ -42,7 +42,7 @@ function MealsPage() {
             </tr>
           </thead>
           <tbody>
-            {meals.map((meal, index) => (
+            {meal.map((meal, index) => (
               <tr key={index} className="text-center">
                 <td className="border p-2">{index + 1}</td>
                 <td className="border p-2">{meal.breakfast}</td>
