@@ -1,10 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function AdaptiveFeedbackForm() {
   const [weightChange, setWeightChange] = useState("");
   const navigate = useNavigate();
+  const [data, setData] = useState();
+
+  useEffect(() => {
+    axios.get(`${import.meta.env.VITE_API_URL}/userdetails`, { withCredentials: true })
+      .then(res => {
+        setData(res.data);
+      })
+      .catch((err) => 
+        console.log(err)
+      );
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,7 +31,7 @@ export default function AdaptiveFeedbackForm() {
     };
 
     try {
-      await axios.post(`${import.meta.env.URL}/feedback`, payload);
+      await axios.post(`${import.meta.env.VITE_API_URL}/feedback`, payload);
       // navigate("/meals");
     } catch (err) {
       console.error(err);

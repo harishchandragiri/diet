@@ -1,6 +1,21 @@
+import React, { useState, useEffect } from 'react'
+import axios from 'axios';
+
+
 // MealsPage.jsx
 function MealsPage() {
 
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    axios.get(`${import.meta.env.VITE_API_URL}/getmeals`, { withCredentials: true })
+      .then(res => {
+        setData(res.data);
+      })
+      .catch((err) => 
+        console.log(err)
+      );
+  }, []);
   
   const meals = [
     { breakfast: "tea", lunch: "rice",snack: "fast food", dinner: "bread" },

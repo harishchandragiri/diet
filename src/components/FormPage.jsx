@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from 'axios';
 import { userContext } from '../App';
 import { useContext } from 'react';
 
 function FormPage() {
   const { activity, setActivity } = useContext(userContext);
-  const { user, setUser } = useContext(userContext);
 
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -13,7 +13,7 @@ function FormPage() {
     gender: "male",
     height: "",
     weight: "",
-    activity_level: "moderately_active",
+    activity_level: activity,
     goal: "maintain",
     food_allergies: ["none"], // Default allergy is "none"
   });
@@ -77,7 +77,15 @@ function FormPage() {
       return;
     }
 
-    console.log("Submitted data:", formData);
+    axios.post(`${import.meta.env.VITE_API_URL}/create`, {formData}, { withCredentials: true })
+      .then(res => {
+        if (res.status === 200) {
+         // add user email as context
+        }
+      })
+      .catch(err => console.log(err));
+    // console.log("Submitted data:", formData);
+
     navigate("/meals");
   };
 
