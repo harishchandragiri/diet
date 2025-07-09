@@ -1,13 +1,15 @@
 // MealsPage.jsx
 function MealsPage() {
+
+  
   const meals = [
-    { breakfast: "tea", lunch: "rice", dinner: "bread" },
-    { breakfast: "tea", lunch: "rice", dinner: "bread" },
-    { breakfast: "tea", lunch: "rice", dinner: "bread" },
-    { breakfast: "tea", lunch: "rice", dinner: "bread" },
-    { breakfast: "tea", lunch: "rice", dinner: "bread" },
-    { breakfast: "tea", lunch: "rice", dinner: "bread" },
-    { breakfast: "tea", lunch: "rice", dinner: "bread" },
+    { breakfast: "tea", lunch: "rice",snack: "fast food", dinner: "bread" },
+    { breakfast: "tea", lunch: "rice",snack: "fast food", dinner: "bread" },
+    { breakfast: "tea", lunch: "rice",snack: "fast food", dinner: "bread" },
+    { breakfast: "tea", lunch: "rice",snack: "fast food", dinner: "bread" },
+    { breakfast: "tea", lunch: "rice",snack: "fast food", dinner: "bread" },
+    { breakfast: "tea", lunch: "rice",snack: "fast food", dinner: "bread" },
+    { breakfast: "tea", lunch: "rice",snack: "fast food", dinner: "bread" },
   ];
 
   return (
@@ -20,6 +22,7 @@ function MealsPage() {
               <th className="border p-2">Day</th>
               <th className="border p-2">Breakfast</th>
               <th className="border p-2">Lunch</th>
+              <th className="border p-2">Snack</th>
               <th className="border p-2">Dinner</th>
             </tr>
           </thead>
@@ -29,6 +32,7 @@ function MealsPage() {
                 <td className="border p-2">{index + 1}</td>
                 <td className="border p-2">{meal.breakfast}</td>
                 <td className="border p-2">{meal.lunch}</td>
+                <td className="border p-2">{meal.snack}</td>
                 <td className="border p-2">{meal.dinner}</td>
               </tr>
             ))}
