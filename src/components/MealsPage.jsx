@@ -1,56 +1,64 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-
-// MealsPage.jsx
 function MealsPage() {
-
   const [meals, setMeals] = useState([]);
 
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_URL}/getmeals`, { withCredentials: true })
-      .then(res => {
-        setMeals(res.data);
+    axios
+      .get(`${import.meta.env.VITE_API_URL}/getmeals`, {
+        withCredentials: true,
       })
-      .catch((err) => 
-        console.log(err)
-      );
+      .then((res) => {
+        if (res.data.length > 0 && res.data[0].mealsByDay) {
+          setMeals(res.data[0].mealsByDay);
+          console.log(res.data[0].mealsByDay);
+        }
+      })
+      .catch((err) => console.log(err));
   }, []);
-  
-  const meal = [
-    { breakfast: "tea", lunch: "rice",snack: "fast food", dinner: "bread" },
-    { breakfast: "tea", lunch: "rice",snack: "fast food", dinner: "bread" },
-    { breakfast: "tea", lunch: "rice",snack: "fast food", dinner: "bread" },
-    { breakfast: "tea", lunch: "rice",snack: "fast food", dinner: "bread" },
-    { breakfast: "tea", lunch: "rice",snack: "fast food", dinner: "bread" },
-    { breakfast: "tea", lunch: "rice",snack: "fast food", dinner: "bread" },
-    { breakfast: "tea", lunch: "rice",snack: "fast food", dinner: "bread" },
-  ];
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 p-4 bg-green-200  shadow rounded">
-      <h2 className="text-2xl font-bold mb-4 w-full text-center">Daily Meal Plan</h2>
+    <div className="max-w-6xl mx-auto mt-3 p-4 bg-green-200 shadow rounded">
+      <h2 className="text-2xl font-bold mb-4 w-full text-center">
+        Daily Meal Plan
+      </h2>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[400px] border-collapse border border-gray-300">
+        <table className="w-full min-w-[800px] border-collapse border border-gray-300">
           <thead>
             <tr>
-              <th className="border p-2">Day</th>
-              <th className="border p-2">Breakfast</th>
-              <th className="border p-2">Lunch</th>
-              <th className="border p-2">Snack</th>
-              <th className="border p-2">Dinner</th>
+              <th className="border p-3">Day</th>
+              <th className="border p-3">Breakfast</th>
+              <th className="border p-3">Lunch</th>
+              <th className="border p-3">Snack</th>
+              <th className="border p-3">Dinner</th>
             </tr>
           </thead>
           <tbody>
-            {meal.map((meal, index) => (
-              <tr key={index} className="text-center">
-                <td className="border p-2">{index + 1}</td>
-                <td className="border p-2">{meal.breakfast}</td>
-                <td className="border p-2">{meal.lunch}</td>
-                <td className="border p-2">{meal.snack}</td>
-                <td className="border p-2">{meal.dinner}</td>
+            {meals.length > 0 ? (
+              meals.map((meal, index) => {
+                const breakfast = JSON.parse(meal.meals.breakfast || '{}');
+                const lunch = JSON.parse(meal.meals.lunch || '{}');
+                const snacks = JSON.parse(meal.meals.snacks || '{}');
+                const dinner = JSON.parse(meal.meals.dinner || '{}');
+
+                return (
+                  <tr key={index} className="text-center">
+                    <td className="border p-3 font-semibold">{meal.day}</td>
+                    <td className="border p-3">{breakfast.name || 'N/A'}</td>
+                    <td className="border p-3">{lunch.name || 'N/A'}</td>
+                    <td className="border p-3">{snacks.name || 'N/A'}</td>
+                    <td className="border p-3">{dinner.name || 'N/A'}</td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan="5" className="p-4 text-center">
+                  Loading or No Meals Found.
+                </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

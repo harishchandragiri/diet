@@ -1,24 +1,55 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { userContext } from '../App';
-import { useContext } from 'react';
 
 function FormPage() {
-  const { activity, setActivity } = useContext(userContext);
-
+  const { activity } = useContext(userContext);
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     age: "",
-    gender: "male",
+    gender: "",
     height: "",
     weight: "",
+    // activity_level: "moderately_active",
     activity_level: activity,
-    goal: "maintain",
-    food_allergies: ["none"], // Default allergy is "none"
+    weight_goal: "",
+    dietary_pref: "all",
+    allergies: ["none"],
   });
+
+
+
+  const newData = {
+  age: 30,
+  gender: "male",
+  height: 175,
+  weight: 72,
+  activity_level: "moderately_active",
+  weight_goal: "loss",
+  dietary_pref: "all",
+  allergies: ["none"],
+  target_calories: 2100,
+  weight_change: -0.8,
+  weeks_elapsed: 2,
+  user_id: 1
+};
+
+
+
+
   const [selectedAllergy, setSelectedAllergy] = useState("");
+  const [response, setResponse] = useState();
+  // const [calories, setCalories] = useState();
   const [error, setError] = useState("");
+
+  const profile = {
+    ...formData,
+    age: Number(formData.age),
+    height: Number(formData.height),
+    weight: Number(formData.weight)
+  };
 
   const activityLevels = [
     { value: "sedentary", label: "Sedentary" },
@@ -46,52 +77,197 @@ function FormPage() {
     if (!value) return;
 
     setFormData((prev) => {
-      const current = prev.food_allergies.filter((a) => a !== "none");
+      const current = prev.allergies.filter((a) => a !== "none");
       if (!current.includes(value)) {
         return {
           ...prev,
-          food_allergies: [...current, value],
+          allergies: [...current, value],
         };
       }
       return prev;
     });
 
-    setSelectedAllergy("none");
+    setSelectedAllergy("");
   };
 
   const removeAllergy = (allergyToRemove) => {
     setFormData((prev) => {
-      const updated = prev.food_allergies.filter((a) => a !== allergyToRemove);
+      const updated = prev.allergies.filter((a) => a !== allergyToRemove);
       return {
         ...prev,
-        food_allergies: updated.length > 0 ? updated : ["none"],
+        allergies: updated.length > 0 ? updated : ["none"],
       };
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const ageNum = Number(formData.age);
-    if (isNaN(ageNum) || ageNum < 0 || ageNum > 100) {
-      setError("Age must be between 0 and 100.");
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  const ageNum = Number(formData.age);
+  if (isNaN(ageNum) || ageNum < 0 || ageNum > 100) {
+    setError("Age must be between 0 and 100.");
+    return;
+  }
+
+  try {
+    const res1 = await axios.post(
+      `${import.meta.env.VITE_API_URL_API}/recommend`,
+      profile
+    );
+
+    if (res1.status === 400) {
+      console.log("No suitable plan could be generated");
       return;
     }
 
-    axios.post(`${import.meta.env.VITE_API_URL}/create`, {formData}, { withCredentials: true })
-      .then(res => {
-        if (res.status === 200) {
-         // add user email as context
-        }
-      })
-      .catch(err => console.log(err));
-    // console.log("Submitted data:", formData);
+    const data = res1.data;
+    setResponse(data);
+
+    const targetCalories =
+      data?.nutrition_summary?.user_profile?.target_calories ?? 0;
+
+    const profileData = {
+      ...formData,
+      target_calories: targetCalories,
+      age: Number(formData.age),
+      height: Number(formData.height),
+      weight: Number(formData.weight),
+    };
+
+    await axios.post(
+      `${import.meta.env.VITE_API_URL}/create`,
+      { profileData },
+      { withCredentials: true }
+    );
+
+    // ✅ compute mealresponse *here* from `data` not from `response`
+    const mealresponse = data?.meal_plan
+      ? Object.keys(data.meal_plan).map((dayKey, index) => {
+          const dayData = data.meal_plan[dayKey];
+          return {
+            day: index + 1,
+            meals: {
+              breakfast: JSON.stringify(dayData.breakfast),
+              lunch: JSON.stringify(dayData.lunch),
+              snacks: JSON.stringify(dayData.snack),
+              dinner: JSON.stringify(dayData.dinner),
+            },
+          };
+        })
+      : [];
+
+    if (mealresponse.length === 0) {
+      console.warn("No meal plan available, skipping meal plan submission.");
+      return;
+    }
+
+    await axios.post(
+      `${import.meta.env.VITE_API_URL}/mealplan`,
+      { mealresponse },
+      { withCredentials: true }
+    );
 
     navigate("/meals");
-  };
+
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+
+
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     const ageNum = Number(formData.age);
+//     if (isNaN(ageNum) || ageNum < 0 || ageNum > 100) {
+//       setError("Age must be between 0 and 100.");
+//       return;
+//     }
+
+
+//     await axios.post(`${import.meta.env.VITE_API_URL_API}/recommend`, profile)
+//   .then(async res => {
+//     if (res.status === 400) {
+//       console.log("No suitable plan could be generated");
+//       return;
+//     }
+
+//     setResponse(res.data);
+
+//     const targetCalories = res.data?.nutrition_summary?.user_profile?.target_calories ?? 0;
+
+//     const profileData = {
+//       ...formData,
+//       target_calories: targetCalories,
+//       age: Number(formData.age),
+//       height: Number(formData.height),
+//       weight: Number(formData.weight),
+//     };
+
+//     await axios.post(`${import.meta.env.VITE_API_URL}/create`, { profileData }, { withCredentials: true })
+//       .then(res => {
+//         if (res.status === 200) {
+//           console.log("Profile created", res.status);
+//         }
+//       })
+//       .catch(err => console.log(err));
+
+//     // next steps…
+//   })
+//   .catch(err => console.log(err));
+
+
+
+//     // // Test
+//     //    await axios.post(`${import.meta.env.VITE_API_URL_API}/feedback`, newData)
+//     //   .then(res => {
+//     //     if (res.status === 400) {
+//     //       console.log("No suitable plan could be generated");
+//     //     }
+//     //     setResponse(res.data);
+//     //     console.log(res.data)
+//     //   })
+//     //   .catch(err => console.log(err));
+
+
+// const mealresponse =
+//   response?.meal_plan
+//     ? Object.keys(response.meal_plan).map((dayKey, index) => {
+//         const dayData = response.meal_plan[dayKey];
+//         return {
+//           day: index + 1,
+//           meals: {
+//             breakfast: JSON.stringify(dayData.breakfast),
+//             lunch: JSON.stringify(dayData.lunch),
+//             snacks: JSON.stringify(dayData.snack),
+//             dinner: JSON.stringify(dayData.dinner),
+//           },
+//         };
+//       })
+//     : []; // empty array if no response yet
+
+
+//       // Done
+
+//     await axios.post(`${import.meta.env.VITE_API_URL}/mealplan`, { mealresponse }, { withCredentials: true })
+//       .then(res => {
+//         if (res.status === 201) {
+//           navigate("/meals");
+//         }
+//       })
+//       .catch(err => console.log(err));
+//   };
 
   return (
     <div className="max-w-xl mx-auto mt-5 p-6 bg-green-200 shadow rounded">
       <h1 className="text-2xl font-bold mb-4 text-center">User Profile</h1>
+      {response && response.meal_plan && (
+  <div>
+    Meal plan: {JSON.stringify(response.nutrition_summary.user_profile.target_calories)}
+    {/* Meal plan: {JSON.stringify(response.updated_meal_plan.day_1.breakfast.name)} */}
+  </div>
+)}
+
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && <div className="text-red-500">{error}</div>}
 
@@ -120,6 +296,7 @@ function FormPage() {
             required
             className="w-full border rounded p-2"
           >
+            <option value="">Select gender</option>
             <option value="male">Male</option>
             <option value="female">Female</option>
             <option value="others">Others</option>
@@ -166,12 +343,13 @@ function FormPage() {
         <div>
           <label className="block mb-1">Goal</label>
           <select
-            name="goal"
-            value={formData.goal}
+            name="weight_goal"
+            value={formData.weight_goal}
             onChange={handleChange}
             required
             className="w-full border rounded p-2"
           >
+            <option value="">Select goal</option>
             {goals.map((g) => (
               <option key={g.value} value={g.value}>
                 {g.label}
@@ -192,7 +370,7 @@ function FormPage() {
           >
             <option value="">-- Select an allergy --</option>
             {allergiesOptions
-              .filter((a) => !formData.food_allergies.includes(a))
+              .filter((a) => !(formData.allergies || []).includes(a))
               .map((allergy) => (
                 <option key={allergy} value={allergy}>
                   {allergy}
@@ -202,7 +380,7 @@ function FormPage() {
 
           {/* Display Selected Allergies (hide 'none') */}
           <div className="mt-3 flex flex-wrap gap-2">
-            {formData.food_allergies
+            {(formData.allergies || [])
               .filter((allergy) => allergy !== "none")
               .map((allergy) => (
                 <div
@@ -221,6 +399,7 @@ function FormPage() {
               ))}
           </div>
         </div>
+
         {/* Submit */}
         <button
           type="submit"
