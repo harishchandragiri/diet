@@ -3,41 +3,119 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function AdaptiveFeedbackForm() {
-  const [weightChange, setWeightChange] = useState("");
+  const [weightChange, setWeightChange] = useState('');
   const navigate = useNavigate();
   const [data, setData] = useState(null);
 
+
+   const templateData = {
+    age: 30,
+    gender: "male",
+    height: 175,
+    weight: 72,
+    activity_level: "moderately_active",
+    weight_goal: "loss",
+    dietary_pref: "all",
+    allergies: ["none"],
+    target_calories: 2100,
+    weight_change: -0.8,
+    weeks_elapsed: 2,
+    user_id: 1,
+  };
+
+  const [newData, setNewData] = useState(templateData);
+
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_URL}/userdetails`, { withCredentials: true })
-      .then(res => {
-        setData(res.data);
+    axios
+      .get(`${import.meta.env.VITE_API_URL}/userdetails`, {
+        withCredentials: true,
       })
-      .catch((err) => 
-        console.log(err)
-      );
+      .then((res) => {
+        console.log(res.data);
+
+        const backendData = res.data?.[0] || {}; // if array, take first item
+
+        // merge backend values into template, preserving weight_change, weeks_elapsed, user_id
+        const merged = {
+          ...templateData,
+          ...Object.fromEntries(
+            Object.keys(templateData)
+              .filter((key) => key in backendData)
+              .map((key) => [key, backendData[key]])
+          ),
+        };
+
+        setData(backendData);
+        setNewData(merged);
+
+        console.log("Merged newData:", merged);
+      })
+      .catch((err) => console.log(err));
   }, []);
+
+ const [meals, setmeals] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+      let changedWeight = Number(weightChange) - newData.weight;
+      let weight = Number(weightChange);
+
     const payload = {
-      user_id: 1,
-      user_profile: { bmr: 0 },
-      feedback: {
-        weight_change: Number(weightChange) || 0,
-        weeks_elapsed: 0,
-        satisfaction_score: 0,
-      },
+      ...newData,
+      weight_change: changedWeight
     };
 
-    try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/feedback`, payload);
-      // navigate("/meals");
-    } catch (err) {
-      console.error(err);
+
+ try {
+    const res1 = await axios.post(`${import.meta.env.VITE_API_URL_API}/feedback`, payload);
+
+    if (res1.status === 400) {
+      console.log("No suitable plan could be generated");
+      return;
     }
 
-     navigate("/meals");
+    const data = res1.data;
+    setmeals(data);
+
+    // ✅ compute mealresponse *here* from `data` not from `response`
+const mealresponse =
+  data?.updated_meal_plan
+    ? Object.keys(data.updated_meal_plan).map((dayKey, index) => {
+        const dayData = data.updated_meal_plan[dayKey];
+        return {
+          day: index + 1,
+          meals: {
+            breakfast: JSON.stringify(dayData.breakfast || {}),
+            lunch: JSON.stringify(dayData.lunch || {}),
+            snacks: JSON.stringify(dayData.snack || {}),
+            dinner: JSON.stringify(dayData.dinner || {}),
+          },
+        };
+      })
+    : [];
+
+console.log(mealresponse);
+
+
+    await axios.put(
+      `${import.meta.env.VITE_API_URL}/newmealplan`,
+      { mealresponse },
+      { withCredentials: true }
+    );
+
+
+    await axios.put(
+      `${import.meta.env.VITE_API_URL}/updateweight`,
+      { weight },
+      { withCredentials: true }
+    );
+
+    navigate("/meals");
+
+  } catch (err) {
+    console.log(err);
+  }
 
   };
 
