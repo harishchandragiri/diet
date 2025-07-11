@@ -27,10 +27,10 @@ function MealsPage() {
         <table className="w-full min-w-[800px] border-collapse border border-gray-300">
           <thead>
             <tr>
-              <th className="border p-3 bg-blue-400">Day</th>
-              <th className="border p-3">Breakfast</th>
+              <th className="border p-3 bg-yellow-400">Day</th>
+              <th className="border p-3 bg-yellow-400">Breakfast</th>
               <th className="border p-3 bg-yellow-400">Lunch</th>
-              <th className="border p-3">Snack</th>
+              <th className="border p-3 bg-yellow-400">Snack</th>
               <th className="border p-3 bg-yellow-400">Dinner</th>
             </tr>
           </thead>
