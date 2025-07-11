@@ -27,11 +27,11 @@ function MealsPage() {
         <table className="w-full min-w-[800px] border-collapse border border-gray-300">
           <thead>
             <tr>
-              <th className="border p-3">Day</th>
+              <th className="border p-3 bg-blue-400">Day</th>
               <th className="border p-3">Breakfast</th>
-              <th className="border p-3">Lunch</th>
+              <th className="border p-3 bg-yellow-400">Lunch</th>
               <th className="border p-3">Snack</th>
-              <th className="border p-3">Dinner</th>
+              <th className="border p-3 bg-yellow-400">Dinner</th>
             </tr>
           </thead>
           <tbody>
@@ -44,11 +44,11 @@ function MealsPage() {
 
                 return (
                   <tr key={index} className="text-center">
-                    <td className="border p-3 font-semibold">{meal.day}</td>
-                    <td className="border p-3">{breakfast.name || 'N/A'}</td>
-                    <td className="border p-3">{lunch.name || 'N/A'}</td>
-                    <td className="border p-3">{snacks.name || 'N/A'}</td>
-                    <td className="border p-3">{dinner.name || 'N/A'}</td>
+                    <td className="border text-[18px] p-3 bg-blue-300 font-semibold">{meal.day}</td>
+                    <td className="border text-[18px] p-3">{breakfast.name || 'N/A'}</td>
+                    <td className="border text-[18px] p-3 bg-yellow-200">{lunch.name || 'N/A'}</td>
+                    <td className="border text-[18px] p-3">{snacks.name || 'N/A'}</td>
+                    <td className="border text-[18px] p-3 bg-yellow-200">{dinner.name || 'N/A'}</td>
                   </tr>
                 );
               })
