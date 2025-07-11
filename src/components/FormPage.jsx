@@ -15,7 +15,7 @@ function FormPage() {
     // activity_level: "moderately_active",
     activity_level: activity,
     weight_goal: "",
-    dietary_pref: "all",
+    dietary_pref: "",
     allergies: ["none"],
   });
 
@@ -28,7 +28,7 @@ function FormPage() {
   weight: 72,
   activity_level: "moderately_active",
   weight_goal: "loss",
-  dietary_pref: "all",
+  dietary_pref: "",
   allergies: ["none"],
   target_calories: 2100,
   weight_change: -0.8,
@@ -63,6 +63,8 @@ function FormPage() {
     { value: "gain", label: "Weight gain" },
     { value: "maintain", label: "Maintain weight" },
   ];
+
+
 
   const allergiesOptions = ["gluten", "nuts", "dairy"];
 
@@ -299,7 +301,6 @@ function FormPage() {
             <option value="">Select gender</option>
             <option value="male">Male</option>
             <option value="female">Female</option>
-            <option value="others">Others</option>
           </select>
         </div>
 
@@ -332,6 +333,24 @@ function FormPage() {
             className="w-full border rounded p-2"
           />
         </div>
+
+
+      {/* diet types */}
+      <div>
+        <label className="block mb-1">Diet Type</label>
+        <select
+          name="dietary_pref"
+          value={formData.dietary_pref}
+          onChange={handleChange}
+          required
+          className="w-full border rounded p-2"
+        >
+          <option value="">Select diet type</option>
+            <option value="non-vegetarian">non-vegetarian</option>
+            <option value="vegetarian">vegetarian</option>
+            <option value="vegan">vegan</option>
+        </select>
+      </div>
 
         {/* Activity Level */}
         <div>
