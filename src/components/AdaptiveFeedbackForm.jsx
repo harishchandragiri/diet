@@ -123,7 +123,7 @@ console.log(mealresponse);
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white shadow-md rounded-lg p-6 max-w-md w-full">
         <h1 className="text-2xl font-bold mb-4 text-center text-blue-600">
-          Adaptive Feedback
+          Changed Weight
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -141,7 +141,7 @@ console.log(mealresponse);
             type="submit"
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"
           >
-            Submit Feedback
+            Submit Weight
           </button>
         </form>
       </div>
